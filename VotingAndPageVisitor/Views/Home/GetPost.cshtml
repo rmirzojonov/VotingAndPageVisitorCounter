@@ -1,0 +1,84 @@
+﻿@model Post
+@{
+    ViewData["Title"] = "Post";
+}
+@{
+    int voteCount = 0;
+    foreach(var vote in Model.Votes)
+    {
+        voteCount += vote.Value;
+    }
+}
+<div class="jumbotron">
+    <div class="container">
+        <div class="row">
+            <h2>@Model.Title</h2>
+            <p>@Model.Body</p>
+            <p>View count: <span id="viewCounter">@Model.Views.Count</span></p>
+            <p>
+                Vote count: <span id="voteCounter">
+                @voteCount
+                </span>
+            </p>
+            <button id="upvoteBtn" onclick="upvote()">Upvote</button>
+            <button id="downvoteBtn" onclick="downvote()">Downvote</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    var voteCounter = document.getElementById("voteCounter");
+    var viewCounter = document.getElementById("viewCounter");
+
+
+    var upvoteBtn = document.getElementById("upvoteBtn");
+    var downvoteBtn = document.getElementById("downvoteBtn");
+
+    function upvote() {
+        $.ajax({
+            url: "@Url.Action("Upvote", "Vote", new { id = Model.Id })",
+            method: "POST",
+
+            data: {
+                id: @Model.Id,
+            },
+            success: function (response) {
+                var old = parseInt(voteCounter.innerText);
+                voteCounter.innerText = (old + 1);
+                upvoteBtn.style.display = "none";
+                downvoteBtn.style.display = "block";
+            },
+            statusCode: {
+                401: function () {
+                    alert('You are not authorized.');
+                }
+            }
+
+
+        });
+    }
+
+
+    function downvote() {
+        $.ajax({
+            url: "@Url.Action("Upvote", "Vote", new { id = Model.Id })",
+            method: "POST",
+
+            data: {
+                id: @Model.Id,
+            },
+            success: function (response) {
+                var old = parseInt(voteCounter.innerText);
+                voteCounter.innerText = (old - 1);
+                downvoteBtn.style.display = "none";
+                upvoteBtn.style.display = "block";
+            },
+            statusCode: {
+                401: function () {
+                    alert('You are not authorized.');
+                }
+            }
+
+        });
+    }
+</script>

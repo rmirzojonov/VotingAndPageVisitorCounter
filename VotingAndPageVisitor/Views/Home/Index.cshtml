@@ -1,0 +1,15 @@
+﻿@model IEnumerable<Post>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="jumbotron">
+    <div class="container">
+        @foreach(var post in Model)
+        {
+            <div class="row">
+                <a asp-action="GetPost" asp-route-id="@post.Id">@post.Title</a>
+            </div>
+        }
+    </div>
+</div>
