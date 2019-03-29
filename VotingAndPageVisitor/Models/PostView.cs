@@ -8,6 +8,7 @@ namespace VotingAndPageVisitor.Models
     {
         public int Id { get; set; }
         public int PostId { get; set; }
+        public string ViewerId { get; set; }
         public DateTime Date { get; set; }
 
         public Post Post { get; set; }

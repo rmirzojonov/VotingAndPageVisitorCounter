@@ -37,25 +37,38 @@ namespace VotingAndPageVisitor.Controllers
             if (post == null)
                 return RedirectToAction(nameof(Index));
 
-            var session = HttpContext.Session;
-            if(!HttpContext.Session.Keys.Contains("History"))
-            {
-                HttpContext.Session.SetObjectAsJson("History", new List<int>());
-            }
-            List<int> visited = HttpContext.Session.GetObjectFromJson<List<int>>("History");
-            if (!visited.Contains(id))
+            var viewerId = User.FindFirst(ClaimTypes.Anonymous).Value;
+            if (!post.Views.Any(p => p.ViewerId == viewerId))
             {
                 var view = new PostView()
                 {
                     PostId = post.Id,
+                    ViewerId = viewerId,
                     Date = DateTime.Now
                 };
 
                 await _context.PostViews.AddAsync(view);
                 await _context.SaveChangesAsync();
-                visited.Add(id);
-                HttpContext.Session.SetObjectAsJson("History", visited);
             }
+
+            //if (!HttpContext.Session.Keys.Contains("History"))
+            //{
+            //    HttpContext.Session.SetObjectAsJson("History", new List<int>());
+            //}
+            //List<int> visited = HttpContext.Session.GetObjectFromJson<List<int>>("History");
+            //if (!visited.Contains(id))
+            //{
+            //    var view = new PostView()
+            //    {
+            //        PostId = post.Id,
+            //        Date = DateTime.Now
+            //    };
+
+            //    await _context.PostViews.AddAsync(view);
+            //    await _context.SaveChangesAsync();
+            //    visited.Add(id);
+            //    HttpContext.Session.SetObjectAsJson("History", visited);
+            //}
             return View(post);
         }
 

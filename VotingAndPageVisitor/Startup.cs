@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using VotingAndPageVisitor.Data;
 using VotingAndPageVisitor.Models;
 using VotingAndPageVisitor.Services;
+using VotingAndPageVisitor.Middlewares;
 
 namespace VotingAndPageVisitor
 {
@@ -26,6 +27,9 @@ namespace VotingAndPageVisitor
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication("Cookies")
+                .AddCookie("Cookies");
+
             services.AddDbContext<ApplicationDbContext>(c =>
                    c.UseInMemoryDatabase("vapv"));
 
@@ -44,14 +48,14 @@ namespace VotingAndPageVisitor
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
 
+            //services.AddDistributedMemoryCache();
+            //services.AddSession(options =>
+            //{
+            //    options.Cookie.HttpOnly = true;
+            //});
             services.AddMvc()
                 .AddJsonOptions(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
-            services.AddDistributedMemoryCache();
-            services.AddSession(options =>
-            {
-                options.Cookie.HttpOnly = true;
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,8 +74,10 @@ namespace VotingAndPageVisitor
 
             app.UseStaticFiles();
 
-            app.UseSession();
+            //app.UseSession();
+            app.UseMiddleware<AnonymousSessionMiddleware>();
             app.UseAuthentication();
+     
 
             app.UseMvc(routes =>
             {
